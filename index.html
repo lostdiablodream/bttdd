@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Battletoads &amp; Double Dragon — Хвост Крысолёта (платформер)</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <h1>Battletoads &amp; Double Dragon</h1>
+    <p class="subtitle">Уровень 1 — Хвост Крысолёта (порт NES-оригинала)</p>
+  </header>
+
+  <main class="game-layout">
+    <!--
+      ВНИМАНИЕ: игра использует ES-модули, поэтому file:// НЕ сработает
+      в большинстве браузеров (модули блокируются CORS-политикой file:).
+      Запуск из каталога game/:
+        python3 -m http.server 8000
+      затем открыть http://localhost:8000/
+    -->
+    <div class="canvas-wrap">
+      <!-- Внутреннее разрешение canvas фиксировано: 960×540 игровых координат.
+           Масштабирование выполняется только через CSS (max-width), игровые
+           координаты от этого не зависят. -->
+      <canvas id="game" width="960" height="540"></canvas>
+    </div>
+
+    <p class="controls-hint">
+      Управление: <kbd>&larr;</kbd>/<kbd>&rarr;</kbd> или <kbd>A</kbd>/<kbd>D</kbd> — движение,
+      <kbd>&uarr;</kbd>/<kbd>&darr;</kbd> или <kbd>W</kbd>/<kbd>S</kbd> — глубина (вглубь/из глубины палубы),
+      <kbd>Space</kbd> — прыжок, <kbd>J</kbd> или <kbd>X</kbd> — удар
+      (серия джебов; смертельный удар сам становится добиванием кулаком/ботинком),
+      двойной тап <kbd>&larr;</kbd>/<kbd>&rarr;</kbd> — рывок, в рывке удар — таран
+    </p>
+
+    <div class="game-buttons">
+      <!-- Кнопки подключены в main.js (C-06): Старт, Пауза/Продолжить, Заново.
+           Атрибут disabled и подпись кнопки паузы выставляются из JS по
+           состоянию игры (syncButtons в boot()/кадре). -->
+      <button id="btn-start" type="button">Старт</button>
+      <button id="btn-pause" type="button">Пауза</button>
+      <button id="btn-restart" type="button">Заново</button>
+      <!-- Кнопка звука (C-12): вкл/выкл музыку; состояние запоминается
+           в localStorage. Подпись выставляется из main.js (syncButtons). -->
+      <button id="btn-sound" type="button" aria-pressed="true">Звук: вкл</button>
+    </div>
+
+    <!-- Экранные кнопки для телефона (C-08): ◀ влево, ▶ вправо, ▲/▼ —
+         глубина палубы (C-14), A — прыжок, B — удар (C-13).
+         Позиционируются fixed внизу вьюпорта поверх canvas (HUD наверху не
+         перекрывается); видны только на тач-устройствах (CSS pointer: coarse).
+         Слушатели pointerdown/up/cancel/leave вешает main.js через
+         initTouchControls() из input.js; удержание = зажатая клавиша. -->
+    <div id="mobile-controls" class="mobile-controls" aria-label="Экранные кнопки управления">
+      <div class="touch-group">
+        <button id="btn-left" class="touch-btn" type="button" aria-label="Движение влево">&#9664;</button>
+        <div class="touch-col">
+          <button id="btn-up" class="touch-btn touch-btn-depth" type="button" aria-label="Вглубь палубы">&#9650;</button>
+          <button id="btn-down" class="touch-btn touch-btn-depth" type="button" aria-label="Из глубины палубы">&#9660;</button>
+        </div>
+        <button id="btn-right" class="touch-btn" type="button" aria-label="Движение вправо">&#9654;</button>
+      </div>
+      <div class="touch-group">
+        <button id="btn-attack" class="touch-btn touch-btn-attack" type="button" aria-label="Удар">B</button>
+        <button id="btn-jump" class="touch-btn touch-btn-jump" type="button" aria-label="Прыжок">A</button>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p>Браузерный платформер по мотивам NES Battletoads &amp; Double Dragon</p>
+  </footer>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

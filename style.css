@@ -1,0 +1,224 @@
+/* Battletoads & Double Dragon — платформер. Тёмная тема «каньон»:
+   тёмно-красно-коричневые тона, как скалы первого уровня. */
+
+:root {
+  --bg-deep: #14080a;
+  --bg-rock: #2a1210;
+  --rock-hi: #4a2018;
+  --lava: #c8502a;
+  --sand: #e8c890;
+  --toad: #58b030;
+  --text: #f0e0c8;
+  --text-dim: #b09878;
+  --btn-bg: #4a2018;
+  --btn-border: #c8502a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--bg-deep)
+    radial-gradient(ellipse at 50% -10%, var(--bg-rock) 0%, transparent 60%);
+  color: var(--text);
+  font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+.site-header {
+  text-align: center;
+  padding: 12px 8px 4px;
+}
+
+.site-header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sand);
+  text-shadow: 0 2px 0 var(--rock-hi), 0 0 18px rgba(200, 80, 42, 0.45);
+}
+
+.subtitle {
+  margin: 4px 0 0;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+
+.game-layout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 1000px;
+  padding: 8px 12px 24px;
+}
+
+.canvas-wrap {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+/* Canvas 960×540 масштабируется по ширине контейнера через CSS;
+   игровые координаты остаются фиксированными (960×540). */
+#game {
+  width: 100%;
+  max-width: 960px;
+  aspect-ratio: 16 / 9;
+  height: auto;
+  display: block;
+  background: #000;
+  border: 3px solid var(--rock-hi);
+  border-radius: 6px;
+  box-shadow: 0 0 24px rgba(0, 0, 0, 0.8), 0 0 12px rgba(200, 80, 42, 0.25);
+  image-rendering: pixelated;
+  touch-action: none; /* жесты по canvas не скроллят/не зумят страницу (C-08) */
+}
+
+.controls-hint {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--text-dim);
+  text-align: center;
+}
+
+kbd {
+  display: inline-block;
+  padding: 1px 6px;
+  border: 1px solid var(--btn-border);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  background: var(--btn-bg);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.85em;
+}
+
+.game-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.game-buttons button {
+  min-width: 110px;
+  padding: 8px 18px;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--text);
+  background: var(--btn-bg);
+  border: 2px solid var(--btn-border);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, opacity 0.15s;
+}
+
+.game-buttons button:hover:not(:disabled) {
+  background: var(--lava);
+  color: #fff;
+}
+
+.game-buttons button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* Экранные кнопки для телефона (C-08). Полупрозрачные круглые кнопки
+   пришиты к низу вьюпорта (fixed) поверх canvas: ◀ ▶ + колонка ▲/▼
+   (глубина, C-14) — слева, B/A — справа. HUD игры вверху canvas кнопками
+   не перекрывается.
+   На десктопе с точным указателем (мышь) скрыты — показываются только
+   на тач-устройствах (pointer: coarse). */
+.mobile-controls {
+  display: none;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 0 14px calc(14px + env(safe-area-inset-bottom, 0px));
+  pointer-events: none; /* перехватывают касание только сами кнопки */
+}
+
+@media (pointer: coarse) {
+  .mobile-controls {
+    display: flex;
+  }
+}
+
+.touch-group {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+/* Колонка кнопок глубины ▲/▼ (C-14) между ◀ и ▶ */
+.touch-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.touch-btn-depth {
+  width: 58px;
+  height: 58px;
+  font-size: 1.3rem;
+}
+
+.touch-btn {
+  pointer-events: auto; /* контейнер прозрачен для касаний, кнопки — нет */
+  touch-action: none; /* жесты на кнопке не скроллят/не зумят страницу */
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 2px solid var(--btn-border);
+  background: rgba(74, 32, 24, 0.55);
+  color: rgba(240, 224, 200, 0.92);
+  font-size: 1.7rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+}
+
+.touch-btn:active {
+  background: rgba(200, 80, 42, 0.75);
+  color: #fff;
+}
+
+/* Прыжок — главная кнопка, крупнее остальных */
+.touch-btn-jump {
+  width: 84px;
+  height: 84px;
+  font-size: 2rem;
+}
+
+/* Удар (B, C-13) — рядом с прыжком, чуть меньше (как на геймпаде NES) */
+.touch-btn-attack {
+  width: 76px;
+  height: 76px;
+  font-size: 1.85rem;
+  align-self: flex-end;
+}
+
+.site-footer {
+  margin-top: auto;
+  padding: 10px;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  opacity: 0.7;
+}
